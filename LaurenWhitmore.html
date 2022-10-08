@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Currency Converter</title>
+<meta name="description" content="">
+<meta name="author" content="">
+<link rel="stylesheet" href="">
+<style>
+    .Amount{
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+
+    }
+    h1{
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: rgb(243, 227, 239);
+        color:rgb(238, 25, 185);
+    }
+    .select{
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+    .information{
+        background-color: rgb(243, 227, 239);
+        padding-top: 4%;
+        padding-bottom: 4%;
+    }
+    #convert{
+        background-color: rgb(238, 25, 185);
+        color: rgb(243, 227, 239);
+    }
+    #results{
+        text-align: center;
+    }
+</style>
+</head>
+<body>
+<h1>Currency Converter</h1>
+<div class="information">
+    <div class="Amount">
+        <span>Amount to Convert: </span>
+        <input type="number" id ="amount">
+    </div>
+    <div class="select">
+        <p></p>
+        <span>From: </span>
+        <select id="from-rate" class ="input" ></select>
+        <span>  To: </span>
+        <select id="to-rate" class="input"></select>
+        <button id="convert">Convert!</button>
+    </div>
+    <div>
+        <p id="results"></p>
+    </div>
+</div>
+<script>
+    //declare variables
+const from = document.getElementById("from-rate");
+const to = document.getElementById("to-rate");
+const button= document.getElementById("convert")
+const amountValue = document.getElementById("amount")
+const resultsTxt= document.getElementById("results")
+var myHeaders = new Headers();
+myHeaders.append("apikey", "LoHyo5GwQNF11CVYZy69K49S2VooW41N");
+
+var requestOptions = {
+  method: 'GET',
+  redirect: 'follow',
+  headers: myHeaders
+};
+//convert function, fetch the api and find the result and show the value
+async function convert(from, to, amount){
+    fetch(`https://api.apilayer.com/exchangerates_data/convert?to=${to}&from=${from}&amount=${amount}`, requestOptions)
+        .then(response => response.json())
+        .then((data)=>{
+            resultsTxt.innerText=data.result
+        })
+}
+//get the currencies and fill the lists
+getCurrencies = function(){
+    fetch("https://api.apilayer.com/exchangerates_data/symbols", requestOptions)
+        .then(response => response.json())
+        .then((data)=>{
+            for(const country in data.symbols){
+                from.options[from.options.length]= new Option(country) 
+                to.options[to.options.length]= new Option(country) 
+            }
+        });
+}
+getCurrencies();//call function
+//when button is clicked call convert
+button.addEventListener("click", async()=>{
+    const res= await convert(from.options[from.selectedIndex].textContent, to.options[to.selectedIndex].textContent, amountValue.value);
+});
+</script>
+</body>
+</html>
